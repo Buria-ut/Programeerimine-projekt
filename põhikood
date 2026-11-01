@@ -1,0 +1,25 @@
+from datetime import date
+tasks = []
+aine = ''
+
+while True:
+    aine = input('Sisesta aine: ')
+    if aine == 'stop':
+        break
+    ul = input('Sisesta ülesanne: ')
+    aasta = int(input('Sisesta tähtaja aasta: '))
+    kuu = int(input('Sisesta tähtaja kuu: '))
+    paev = int(input('Sisesta tähtaja päev: '))
+    ajakulu = float(input('Sisesta ajakulu tundides: '))
+
+    task = {
+        "aine": aine,
+        "ülesanne": ul,
+        "tähtaeg": date(aasta, kuu, paev),
+        "ajakulu": ajakulu}
+
+    tasks.append(task)
+
+    for t in tasks:
+        print(t["tähtaeg"], t["aine"], t["ülesanne"],'-', t["ajakulu"], "h")
+
