@@ -32,9 +32,12 @@ def salvesta_ulesanne_faili(fnimi, ulesanded):
     f.close()
 
 def vota_tahtaeg(ulesanne):
+    # tagastab ühe ülesande tähtaja, et seda saaks kasutada sorteerimisel
     return ulesanne['tahtaeg']
 
 def jaga_ajakulu(ulesanne):
+    # jagab ülesande mahu plokkideks, millest igaüks on kuni paevane_limiit tundi
+    # tagastab plokkide listi, nt 5 h -> [2, 2, 1]
     blocks = []
     ajakulu = ulesanne['maht']
     while ajakulu > paevane_limiit:
@@ -44,6 +47,9 @@ def jaga_ajakulu(ulesanne):
     return blocks
 
 def koosta_järjekord():
+    # koostab kõigi ülesannete põhjal ajakava ja kirjutab selle faili ajakava.txt
+    
+    # sorteerime ülesanded tähtaja järgi (lähim tähtaeg esimesena)
     ulesanded_loendina = sorted(ulesanded.values(), key=vota_tahtaeg)
 
     ajakava = {}   # kuupäev -> mida sel päeval teha
@@ -53,12 +59,14 @@ def koosta_järjekord():
         paev = date.today()
         for blok in jaga_ajakulu(t):
             if paev > viimane_paev:
-                print(f'HOIATUS: {t["aine"]} {t["kirjeldus"]}: {blok} h ei mahu tähtajaks ära')
+                # blokk ei mahu enne tähtaega ära, anname hoiatuse
+                print(f'\nHOIATUS: {t["aine"]} {t["kirjeldus"]}: {blok} h ei mahu tähtajaks ära\n')
             else:
                 if paev not in ajakava:
                     ajakava[paev] = []
                 ajakava[paev].append(f'{t["aine"]}: {t["kirjeldus"]} - {blok} h')
             paev = paev + timedelta(days=1)
+    # kirjutame faili järgmised 7 päeva, tühjad päevad märgime vabaks
     with open('ajakava.txt', 'w', encoding='utf-8') as file:
         for i in range(7):
             paev = date.today() + timedelta(days=i)
@@ -70,6 +78,7 @@ def koosta_järjekord():
                 file.write('  vaba päev\n')
 
 def loe_jarjekord():
+    # loeb valmis ajakava failist ja kuvab selle ekraanil
     try:
         with open('ajakava.txt', 'r', encoding='utf-8') as file:
             sisu = file.read().strip()
@@ -78,6 +87,7 @@ def loe_jarjekord():
             else:
                 print(sisu)
     except:
+        # faili pole
         print ('Sul on kõik õpitud.')
         
 def lisa_ulesanne(kood, aine, kirjeldus, tahtaeg, maht):
@@ -128,7 +138,8 @@ def kuva_ulesanded():
         for ulesanne in ulesanded_sorteeritud:
             tahtaeg_kuvamiseks = ulesanne['tahtaeg'].strftime('%d.%m.%Y')
             print(f'{tahtaeg_kuvamiseks}: {ulesanne['kood']}, {ulesanne['aine']}, {ulesanne['kirjeldus']}, {ulesanne['maht']} h')     
-        
+
+#põhiprigramm
 while True:
     ulesanded = loe_ulesanne_failist('ulesanded.txt')
     print('Ülesande lisamiseks sisesta "Lisa"')
@@ -171,5 +182,3 @@ while True:
         kuva_ulesanded()      
     else:
         print('Vigane sisend. Proovi uuesti')
-        
-
